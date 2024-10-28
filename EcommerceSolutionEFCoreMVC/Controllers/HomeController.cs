@@ -1,4 +1,5 @@
-using EcommerceSolutionEFCoreMVC.Models;
+using EcommerceSolutionEFCoreMVC.Models.ErrorViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -17,7 +18,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         {
             return View();
         }
-
+        [Authorize]
         public IActionResult Privacy()
         {
             return View();

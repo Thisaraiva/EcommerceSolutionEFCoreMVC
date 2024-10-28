@@ -1,4 +1,4 @@
-namespace EcommerceSolutionEFCoreMVC.Models
+namespace EcommerceSolutionEFCoreMVC.Models.ErrorViewModel
 {
     public class ErrorViewModel
     {
