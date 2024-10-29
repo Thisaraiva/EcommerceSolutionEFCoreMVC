@@ -1,19 +1,32 @@
 using EcommerceSolutionEFCoreMVC.Data;
+using EcommerceSolutionEFCoreMVC.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)    
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()    
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "AspNetCore.Cookies";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
 
 builder.Services.AddControllersWithViews();
 
@@ -36,12 +49,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+await CreateUserProfile(app);
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "areas",
-    pattern: "{areas=exists}/{controller=Identity}/{action=Index}/{id?}");
+    name: "AdminArea",
+    pattern: "{areas=exists}/{controller=Admin}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
@@ -50,3 +65,14 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+async Task CreateUserProfile(WebApplication app)
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+    using (var scope = scopedFactory.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetService<ISeedUserRoleInitial>();
+        await service.SeedRolesAsync();
+        await service.SeedUsersAsync();
+    }
+}

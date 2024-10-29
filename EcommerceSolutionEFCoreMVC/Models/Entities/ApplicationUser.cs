@@ -35,13 +35,13 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         public DateTime RegisterDate { get; private set; } = DateTime.UtcNow;
         [PersonalData]
         public int ShoppingCartId { get; set; }
-        public ShoppingCart ShoppingCart { get; set; }
+        public ShoppingCart? ShoppingCart { get; set; }
         [PersonalData]
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         [PersonalData]
         public int PositionId { get; set; }
         [PersonalData]
-        public Position Position { get; set; }
+        public Position? Position { get; set; }
         [PersonalData]
         public DateTime HireDate { get; set; } = DateTime.UtcNow;
 
