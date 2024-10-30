@@ -1,17 +1,4 @@
 ﻿<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
-</head>
-<body>
-    <div>
-        @RenderBody()
-    </div>
-</body>
-</html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -34,9 +21,11 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Admin" asp-controller="Admin" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="AdminRoles" asp-action="Index">Manage Roles</a>
+                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="AdminUsers" asp-action="Index">Manage Users</a>
+
                         </li>
-                    </ul>
-                    <partial name="_LoginPartial.cshtml" />
+                    </ul>                    
                 </div>
             </div>
         </nav>
