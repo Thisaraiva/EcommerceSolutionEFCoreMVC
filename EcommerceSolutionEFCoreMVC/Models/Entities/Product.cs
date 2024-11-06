@@ -10,13 +10,14 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         public string? Description { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Price { get; set; }
+        [Display(Name = "Image")]
         public string? ImageUrl { get; set; }
         [DataType(DataType.Date)]
         public DateTime? Created { get; set; } = DateTime.Now;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public ICollection<ShoppingCartItem> ShoppingCartItems { get; set; } = new List<ShoppingCartItem>();
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
 
     }
 

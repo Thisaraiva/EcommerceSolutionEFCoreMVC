@@ -48,55 +48,71 @@ namespace EcommerceSolutionEFCoreMVC.Services.Interfaces
 
                 IdentityResult roleResult = await _roleManager.CreateAsync(role);
             }
-
-
         }
 
         public async Task SeedUsersAsync()
         {
             if (await _userManager.FindByEmailAsync("user@user.com") == null)
             {
-                ApplicationUser admin = new ApplicationUser();
+                ApplicationUser user = new ApplicationUser();
+                user.FirstName = "User";
+                user.LastName = "Common";
+                user.UserName = "user@user.com"; // UserName definido diretamente
+                user.Email = "user@user.com";
+                user.NormalizedUserName = "USERCOMMON";
+                user.NormalizedEmail = "USER@USER.COM";
+                user.EmailConfirmed = true;
+                user.LockoutEnabled = false;
+                user.SecurityStamp = Guid.NewGuid().ToString();
 
-                admin.FirstName = "User";
-                admin.LastName = "Common";
-                admin.UserName = admin.FullName;
-                admin.Email = "user@user.com";
-                admin.NormalizedUserName = admin.FullName.ToUpper();
-                admin.NormalizedEmail = "USER@USER.COM";
-                admin.EmailConfirmed = true;
-                admin.LockoutEnabled = false;
-                admin.SecurityStamp = Guid.NewGuid().ToString();
 
-                IdentityResult result = await _userManager.CreateAsync(admin, "User@123");
+                IdentityResult result = await _userManager.CreateAsync(user, "User@123");
 
-                if (!result.Succeeded)
+                if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(admin, "User");
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"Error creating user 'user@user.com': {error.Description}");
+                    }
                 }
             }
 
             if (await _userManager.FindByEmailAsync("admin@admin.com") == null)
             {
-                ApplicationUser admin = new ApplicationUser();
-
-                admin.FirstName = "Admin";
-                admin.LastName = "User";
-                admin.UserName = admin.FullName;
-                admin.Email = "admin@admin.com";
-                admin.NormalizedUserName = admin.FullName.ToUpper();
-                admin.NormalizedEmail = "ADMIN@ADMIN.COM";
-                admin.EmailConfirmed = true;
-                admin.LockoutEnabled = false;
-                admin.SecurityStamp = Guid.NewGuid().ToString();
+                ApplicationUser admin = new ApplicationUser
+                {
+                    FirstName = "Adm",
+                    LastName = "Adm",
+                    UserName = "admin@admin.com", // UserName definido diretamente
+                    Email = "admin@admin.com",
+                    NormalizedUserName = "ADM",
+                    NormalizedEmail = "ADMIN@ADMIN.COM",
+                    EmailConfirmed = true,
+                    LockoutEnabled = false,
+                    SecurityStamp = Guid.NewGuid().ToString()
+                };
 
                 IdentityResult result = await _userManager.CreateAsync(admin, "Admin@123");
 
-                if (!result.Succeeded)
+                if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(admin, "Admin");
                 }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"Error creating admin user: {error.Description}");
+                    }
+                }
             }
+            Console.WriteLine("Seeding completed: Users and roles should be created.");
+
         }
+
     }
 }

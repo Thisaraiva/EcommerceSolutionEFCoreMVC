@@ -39,9 +39,9 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         [PersonalData]
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         [PersonalData]
-        public int PositionId { get; set; }
+        public int? PositionId { get; set; }
         [PersonalData]
-        public Position? Position { get; set; }
+        public Position Position { get; set; }
         [PersonalData]
         public DateTime HireDate { get; set; } = DateTime.UtcNow;
 

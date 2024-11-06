@@ -1,25 +1,44 @@
+using EcommerceSolutionEFCoreMVC.Data;
+using EcommerceSolutionEFCoreMVC.Models.Entities;
 using EcommerceSolutionEFCoreMVC.Models.ErrorViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers
 {
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly EcommerceDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, EcommerceDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
+        {
+            var products = _context.Products;
+            if (products == null)
+            {
+                return View();
+            }
+
+
+            return View(await products.ToListAsync());
+        }
+
+        [Authorize]
+        public IActionResult Privacy()
         {
             return View();
         }
-        [Authorize]
-        public IActionResult Privacy()
+
+        public IActionResult AccessDenied()
         {
             return View();
         }

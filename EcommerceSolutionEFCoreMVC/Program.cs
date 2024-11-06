@@ -1,8 +1,11 @@
 using EcommerceSolutionEFCoreMVC.Data;
+using EcommerceSolutionEFCoreMVC.Models.Entities;
 using EcommerceSolutionEFCoreMVC.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,25 +13,49 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? 
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<EcommerceDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.SignIn.RequireConfirmedEmail = true;
+    })
+    .AddRoles<IdentityRole>()
+    .AddDefaultTokenProviders()
+    .AddEntityFrameworkStores<EcommerceDbContext>();
+
+builder.Services.Configure<IdentityOptions>(options => 
+{
+    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedEmail = true;
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+});
+
+/*builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "AspNet.Cookies";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.SlidingExpiration = true;
+    });*/
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()    
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddControllersWithViews();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "AspNetCore.Cookies";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
-        options.SlidingExpiration = true;
-    });
-
-builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
+builder.Services.ConfigureApplicationCookie(options
+    => options.LoginPath = "/Identity/Account/Login");
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddRazorPages();
+
+builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
 
 var app = builder.Build();
 
@@ -49,20 +76,24 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.MapRazorPages();
+
 await CreateUserProfile(app);
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+/*app.MapControllerRoute(
+    name: "areas",
+    pattern: "{areas:exists}/{controller=Home}/{action=Index}/{id?}");*/
+
 app.MapControllerRoute(
-    name: "AdminArea",
-    pattern: "{areas=exists}/{controller=Admin}/{action=Index}/{id?}");
+    name: "Admin",
+    pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.MapRazorPages();
 
 app.Run();
 
