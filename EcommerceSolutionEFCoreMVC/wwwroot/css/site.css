@@ -21,22 +21,53 @@ body {
   margin-bottom: 60px;
 }
 
+.card-img-top {
+    object-fit: contain; /* Faz a imagem se ajustar sem cortar */
+    width: 100%;
+    height: auto; /* Mantém a proporção original da imagem */
+    max-height: 200px; /* Define uma altura máxima para manter o layout dos cards */
+}
+
+.container, .container-fluid {
+    max-width: 1200px; /* Limita a largura em telas grandes */
+    margin: 0 auto; /* Centraliza o container */
+}
+
+.table-responsive {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+table {
+    width: 100%;
+    table-layout: auto; /* Permite que a tabela se ajuste ao container */
+}
+
 /* site.css */
 
 html, body {
-    height: 100%;
+    height: 100%;       
 }
 
 body {
     background-color: #f8f9fa;
     font-family: Arial, sans-serif;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;    
 }
 
-.container {
-    margin-top: 20px;
+.container,  {
+    margin-top: 20px;       
 }
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%; /* Garante que a tabela ocupe 100% do container disponível */
+}
+
 
 /* Espaço extra para o rodapé */
 main {
@@ -51,10 +82,9 @@ main {
 .navbar-dark .navbar-nav .nav-link {
     color: rgba(255, 255, 255, 0.9);
 }
-
-    .navbar-dark .navbar-nav .nav-link:hover {
-        color: #ddd;
-    }
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: #ddd;
+}
 
 /* Rodapé */
 footer {

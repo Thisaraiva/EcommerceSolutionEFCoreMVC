@@ -148,6 +148,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return View(product);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Products/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -167,6 +168,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return View(product);
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
