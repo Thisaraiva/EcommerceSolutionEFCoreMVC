@@ -9,3 +9,4 @@
         public ICollection<ShoppingCartItem> ShoppingCartItems { get; set; } = new List<ShoppingCartItem>();
     }
 }
+
