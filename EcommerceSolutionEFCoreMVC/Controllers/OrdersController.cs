@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using EcommerceSolutionEFCoreMVC.Data;
 using EcommerceSolutionEFCoreMVC.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly EcommerceDbContext _context;
@@ -60,47 +62,8 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return View(order);
         }
 
-
-        // GET: Orders/Create
-        public IActionResult Create()
-        {
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "ApplicationUserId", "Name");
-            return View();
-        }
-
-        // POST: Orders/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderId,ApplicationUserId,OrderDate,Status,TotalAmount")] Order order)
-        {
-            if (ModelState.IsValid)
-            {
-                // Buscando todos os OrderItems relacionados de uma vez só
-                order.OrderItems = await _context.OrderItems
-                    .Where(oi => oi.OrderId == order.OrderId)
-                    .ToListAsync();
-
-                // Calcular subtotal para cada OrderItem
-                foreach (var item in order.OrderItems)
-                {
-                    item.CalculateSubtotal();
-                }
-
-                // Calcular o TotalAmount da Order
-                order.CalculateTotalAmount();
-
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "ApplicationUserId", "Name", order.ApplicationUserId);
-            return View(order);
-        }
-
-
         // GET: Orders/Edit/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -111,28 +74,30 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
 
             if (order == null || (!User.IsInRole("Admin") && order.ApplicationUserId != _userManager.GetUserId(User)))
             {
-                return Unauthorized();
+                return RedirectToAction("AccessDenied", "Account");
             }
 
+            var usersList = await _context.Users
+                .Where(u => u.Id != null && u.UserName != null)
+                .ToListAsync();
+            ViewData["ApplicationUserId"] = new SelectList(usersList, "Id", "UserName", order.ApplicationUserId);
 
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "ApplicationUserId", "Name", order.ApplicationUserId);
             return View(order);
         }
 
-
         // POST: Orders/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("OrderId,ApplicationUserId,OrderDate,Status,TotalAmount")] Order order)
         {
             if (id != order.OrderId) return NotFound();
 
             var existingOrder = await _context.Orders.AsNoTracking().FirstOrDefaultAsync(o => o.OrderId == id);
+
             if (existingOrder == null || (!User.IsInRole("Admin") && existingOrder.ApplicationUserId != _userManager.GetUserId(User)))
             {
-                return Unauthorized();
+                return RedirectToAction("AccessDenied", "Account");
             }
 
             if (ModelState.IsValid)
@@ -150,10 +115,14 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "ApplicationUserId", "Name", order.ApplicationUserId);
+
+            // Recarrega o SelectList caso a ModelState seja inválida
+            ViewData["ApplicationUserId"] = new SelectList(_context.Users, "Id", "UserName", order.ApplicationUserId);
             return View(order);
         }
 
+
+        [Authorize(Roles = "Admin")]
         // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -171,6 +140,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return View(order);
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

@@ -1,6 +1,7 @@
 ﻿using EcommerceSolutionEFCoreMVC.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace EcommerceSolutionEFCoreMVC.Models.Entities
 {
@@ -10,6 +11,7 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         public string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
         [Display(Name = "Date")]
+        [DataType(DataType.Date)]
         public DateTime OrderDate { get; set; }
         public OrderStatus Status { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
