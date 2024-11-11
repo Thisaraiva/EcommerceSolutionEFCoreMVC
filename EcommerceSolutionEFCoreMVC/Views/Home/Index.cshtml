@@ -13,13 +13,20 @@
     <div class="row">
         @foreach (var product in Model)
         {
-            <div class="col-md-4 mb-4">
+            <div class="col-md-3 mb-3">
                 <div class="card shadow-sm">
                     <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
                     <div class="card-body">
                         <h5 class="card-title">@product.Name</h5>
                         <p class="card-text text-muted">@product.Price.ToString("C")</p>
-                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-primary w-100">View Details</a>
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-primary w-50">View Details</a>
+
+                        <form asp-controller="ShoppingCarts" asp-action="AddProduct" method="post" class="d-flex align-items-center mt-2">
+                            <input type="hidden" name="productId" value="@product.ProductId" />
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control w-25 m-2" />
+                            <button type="submit" class="btn btn-primary m-2" style="font-size-adjust: none">Buy</button>
+                        </form>
                     </div>
                 </div>
             </div>

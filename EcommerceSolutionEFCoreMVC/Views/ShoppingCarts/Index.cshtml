@@ -28,15 +28,15 @@
             {
                 <tr>
                     <td>@item.Product.Name</td>
+                    <td>@item.Product.Price.ToString("C")</td>
                     <td>
                         <form asp-action="UpdateProductQuantity" method="post">
                             <input type="hidden" name="productId" value="@item.ProductId" />
                             <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control d-inline" style="width: 60px;" />
                             <button type="submit" class="btn btn-sm btn-primary">Atualizar</button>
                         </form>
-                    </td>
-                    <td>@item.Product.Price.ToString("C")</td>
-                    <td>@(item.Quantity * item.Product.Price).ToString("C")</td>
+                    </td>                    
+                    <td>@item.Subtotal.ToString("C")</td>
                     <td>
                         <form asp-action="RemoveProduct" method="post">
                             <input type="hidden" name="productId" value="@item.ProductId" />
@@ -45,13 +45,14 @@
                     </td>
                 </tr>
             }
-        </tbody>
+        </tbody>        
     </table>
 
-    <h4>Total: @Model.ShoppingCartItems.Sum(i => i.Quantity * i.Product.Price).ToString("C")</h4>
+        <h4>Total: @Model.ShoppingCartItems.Sum(i => i.Subtotal).ToString("C")</h4>
 
     <form asp-action="Checkout" method="post">
         <button type="submit" class="btn btn-success">Finalizar Compra</button>
+        <a asp-controller="Home" asp-action="Index">Back to Home</a>
     </form>
 }
 else

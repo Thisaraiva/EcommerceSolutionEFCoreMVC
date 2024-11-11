@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EcommerceSolutionEFCoreMVC.Data;
 using EcommerceSolutionEFCoreMVC.Models.Entities;
+using EcommerceSolutionEFCoreMVC.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 
@@ -23,6 +24,16 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             _context = context;
             _userManager = userManager;
         }
+
+        private async Task<ShoppingCart> GetUserCartAsync()
+        {
+            var userId = _userManager.GetUserId(User);
+            return await _context.ShoppingCarts
+                                 .Include(c => c.ShoppingCartItems)
+                                 .ThenInclude(ci => ci.Product)
+                                 .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+        }
+
 
         // GET: ShoppingCarts
         public async Task<IActionResult> Index()
@@ -48,10 +59,15 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
 
             if (cart == null)
             {
-                return NotFound();
+                // Cria um novo carrinho se o usuário não tiver um.
+                cart = new ShoppingCart { ApplicationUserId = userId };
+                _context.ShoppingCarts.Add(cart);
+                await _context.SaveChangesAsync();
             }
 
             var cartItem = cart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == productId);
+            var product = await _context.Products.FindAsync(productId);
+
             if (cartItem != null)
             {
                 cartItem.Quantity += quantity;
@@ -62,7 +78,9 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 {
                     ShoppingCartId = cart.ShoppingCartId,
                     ProductId = productId,
-                    Quantity = quantity
+                    Quantity = quantity,
+                    UnitPrice = product.Price // Atribui o preço do produto ao item
+
                 };
                 _context.ShoppingCartItems.Add(cartItem);
             }
@@ -71,15 +89,24 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
         // POST: ShoppingCarts/UpdateProductQuantity
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProductQuantity(int productId, int quantity)
         {
+            if (quantity <= 0)
+            {
+                return await RemoveProduct(productId); // Remove o produto se a quantidade é zero
+            }
+
             var userId = _userManager.GetUserId(User);
             var cart = await _context.ShoppingCarts
                                      .Include(c => c.ShoppingCartItems)
                                      .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+
+            if (cart == null)
+                return NotFound();
 
             var cartItem = cart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == productId);
             if (cartItem != null)
@@ -131,14 +158,17 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             {
                 ApplicationUserId = userId,
                 OrderDate = DateTime.Now,
+                Status = OrderStatus.Created,
                 OrderItems = cart.ShoppingCartItems.Select(i => new OrderItem
                 {
                     ProductId = i.ProductId,
                     Quantity = i.Quantity,
-                    Price = i.Product.Price
-                }).ToList()
+                    UnitPrice = i.Product.Price,
+                    Subtotal = i.Subtotal
+                }).ToList(),
             };
-
+            order.CalculateTotalAmount();
+            
             _context.Orders.Add(order);
             _context.ShoppingCartItems.RemoveRange(cart.ShoppingCartItems);
             await _context.SaveChangesAsync();

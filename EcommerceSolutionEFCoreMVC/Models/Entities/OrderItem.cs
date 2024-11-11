@@ -11,6 +11,14 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         public Product Product { get; set; }
         public int Quantity { get; set; }
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal Price { get; set; }
+        public decimal UnitPrice { get; set; }
+
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal Subtotal { get; set; }
+
+        public void CalculateSubtotal()
+        {
+            Subtotal = UnitPrice * Quantity;
+        }
     }
 }

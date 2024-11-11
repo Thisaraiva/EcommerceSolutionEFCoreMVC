@@ -49,6 +49,13 @@
         </dd>
     </dl>
 </div>
+<form asp-controller="ShoppingCarts" asp-action="AddProduct" method="post" class="d-flex align-items-center m-2">
+    <input type="hidden" name="productId" value="@Model.ProductId" />
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" name="quantity" value="1" min="1" class="form-control w-25 m-2" />
+    <button type="submit" class="btn btn-primary m-2">Buy</button>
+</form>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> |
     <a asp-action="Index">Back to List</a>

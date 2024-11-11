@@ -12,6 +12,9 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         public int Quantity { get; set; }
 
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal Price { get; set; }
+        public decimal UnitPrice { get; set; }
+
+        [NotMapped] // Essa propriedade não será mapeada no banco de dados, pois é calculada
+        public decimal Subtotal => UnitPrice * Quantity;
     }
 }

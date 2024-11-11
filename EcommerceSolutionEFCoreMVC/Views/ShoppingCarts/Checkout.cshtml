@@ -1,0 +1,35 @@
+﻿@model EcommerceSolutionEFCoreMVC.Models.Entities.ShoppingCart
+
+<h2>Checkout</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Produto</th>
+            <th>Preço Unitário</th>
+            <th>Quantidade</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ShoppingCartItems)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Product.Price.ToString("C")</td>
+                <td>@item.Quantity</td>
+                <td>@(item.Product.Price * item.Quantity).ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" class="text-right"><strong>Total Geral:</strong></td>
+            <td>@Model.ShoppingCartItems.Sum(i => i.Product.Price * i.Quantity).ToString("C")</td>
+        </tr>
+    </tfoot>
+</table>
+
+<form asp-action="ConfirmOrder" method="post">
+    <button type="submit" class="btn btn-primary">Confirmar Compra</button>
+</form>

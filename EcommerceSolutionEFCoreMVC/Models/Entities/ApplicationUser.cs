@@ -22,7 +22,7 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
             get => _lastName;
             set => _lastName = ToUpper(value);
         }
-
+        [Display(Name = "Name")]
         public string FullName => $"{FirstName} {LastName}";
 
         [PersonalData]
