@@ -1,0 +1,17 @@
+﻿@using EcommerceSolutionEFCoreMVC.Models.ViewModels
+@model IEnumerable<AddressViewModel>
+
+<h2>Selecione um Endereço de Entrega</h2>
+
+<form asp-controller="ShoppingCarts" asp-action="SelectPaymentMethod" method="post">
+    @foreach (var address in Model)
+    {
+        <div>
+            <input type="radio" name="addressId" value="@address.AddressId" required />
+            <label>@address.FullAddress</label>
+        </div>
+    }
+    <button type="submit" class="btn btn-primary mt-2">Selecionar Endereço</button>
+</form>
+
+<a asp-action="Create" asp-controller="Addresses" class="btn btn-secondary mt-2">Adicionar Novo Endereço</a>

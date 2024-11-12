@@ -8,6 +8,7 @@ using EcommerceSolutionEFCoreMVC.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using EcommerceSolutionEFCoreMVC.Models.ErrorViewModel;
 using System.Diagnostics;
+using EcommerceSolutionEFCoreMVC.Models.Enums;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers
 {
@@ -298,5 +299,52 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public async Task<IActionResult> SelectDeliveryAddress()
+        {
+            var userId = _userManager.GetUserId(User);
+            var addresses = await _context.Addresses
+                                          .Where(a => a.ApplicationUserId == userId)
+                                          .Select(a => new AddressViewModel
+                                          {
+                                              AddressId = a.AddressId,
+                                              ApplicationUserId = a.ApplicationUserId,
+                                              Street = a.Street,
+                                              Number = a.Number,
+                                              Complement = a.Complement,
+                                              Neighborhood = a.Neighborhood,
+                                              City = a.City,
+                                              State = a.State,
+                                              Country = a.Country,
+                                              ZipCode = a.ZipCode                                              
+                                          })
+                                          .ToListAsync();
+
+            return View(addresses);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SelectDeliveryAddress(int addressId)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // Marcar todos os endereços do usuário como não selecionados
+            var userAddresses = await _context.Addresses
+                                              .Where(a => a.ApplicationUserId == userId)
+                                              .ToListAsync();
+
+            foreach (var address in userAddresses)
+            {
+                address.IsSelected = (address.AddressId == addressId);
+            }
+
+            // Salvar a mudança no banco de dados
+            await _context.SaveChangesAsync();
+
+            // Redirecionar para a seleção do método de pagamento
+            return RedirectToAction("SelectDeliveryAddress");
+        }
+
     }
 }

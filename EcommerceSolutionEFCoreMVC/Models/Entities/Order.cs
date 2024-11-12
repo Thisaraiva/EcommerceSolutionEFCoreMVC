@@ -17,6 +17,7 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         [Column(TypeName = "decimal(18, 2)")]
         [Display(Name = "Total")]
         public decimal TotalAmount { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
         public List<OrderItem>? OrderItems { get; set; }
 
         public void CalculateTotalAmount()

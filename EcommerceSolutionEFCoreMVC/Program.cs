@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +58,10 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
 
+var cultureInfo = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,7 +90,7 @@ app.UseAuthorization();
 
 /*app.MapControllerRoute(
     name: "areas",
-    pattern: "{areas:exists}/{controller=Home}/{action=Index}/{id?}");*/
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");*/
 
 app.MapControllerRoute(
     name: "Admin",

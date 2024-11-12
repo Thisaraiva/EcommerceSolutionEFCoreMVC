@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EcommerceSolutionEFCoreMVC.Data;
 using EcommerceSolutionEFCoreMVC.Models.Entities;
 using EcommerceSolutionEFCoreMVC.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using EcommerceSolutionEFCoreMVC.Models.ViewModels;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers
 {
@@ -138,7 +134,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: ShoppingCarts/Checkout
+        /*// POST: ShoppingCarts/Checkout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout()
@@ -174,7 +170,117 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Details", "Orders", new { id = order.OrderId });
+        }*/
+
+        public IActionResult SelectPaymentMethod()
+        {
+            // Exibir opções de pagamento
+            return View();
         }
+
+        [HttpPost, ActionName("SelectPaymentMethod")]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmPaymentMethod(int paymentMethodId)
+        {
+            // Salvar o método de pagamento selecionado
+            TempData["SelectPaymentMethod"] = paymentMethodId;
+
+            // Prosseguir para a revisão do pedido
+            return RedirectToAction("SelectPaymentMethod");
+        }
+
+        public async Task<IActionResult> ReviewOrder()
+        {
+            var userId = _userManager.GetUserId(User);
+            var cart = await _context.ShoppingCarts
+                                     .Include(c => c.ShoppingCartItems)
+                                     .ThenInclude(i => i.Product)
+                                     .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+
+            if (cart == null || !cart.ShoppingCartItems.Any())
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            var selectedAddress = await _context.Addresses
+                                                .FirstOrDefaultAsync(a => a.ApplicationUserId == userId);
+
+            var orderSummary = new OrderSummaryViewModel
+            {
+                ApplicationUserId = userId,
+                UserName = user?.UserName,
+                SelectedAddress = selectedAddress,
+                ShoppingCart = cart,
+                TotalAmount = cart.ShoppingCartItems.Sum(i => i.Subtotal),
+                SelectedPaymentMethod = PaymentMethod.CreditCard, // ou outro método selecionado
+                OrderItems = cart.ShoppingCartItems.Select(i => new OrderSummaryViewModel.OrderItemSummary
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Product.Name,
+                    UnitPrice = i.Product.Price,
+                    Quantity = i.Quantity                    
+                }).ToList(),
+                OrderDate = DateTime.Now
+            };
+
+            return View(orderSummary);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmOrder()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            // Carrega o carrinho de compras do usuário
+            var cart = await _context.ShoppingCarts
+                                      .Include(c => c.ShoppingCartItems)
+                                      .ThenInclude(i => i.Product)
+                                      .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+
+            if (cart == null || !cart.ShoppingCartItems.Any())
+            {
+                return RedirectToAction("Index", "ShoppingCarts");
+            }
+
+            /*// Obtém o método de pagamento selecionado do TempData
+            if (TempData["SelectPaymentMethod"] is not PaymentMethod selectedPaymentMethod)
+            {
+                return RedirectToAction("SelectPaymentMethod");
+            }*/
+
+            // Criação do novo pedido
+            var order = new Order
+            {
+                ApplicationUserId = userId,
+                OrderDate = DateTime.Now,
+                Status = OrderStatus.Created,
+                //TotalAmount = cart.ShoppingCartItems.Sum(i => i.Subtotal),
+                PaymentMethod = /*selectedPaymentMethod*/ PaymentMethod.CreditCard, // Atribui o método de pagamento
+                OrderItems = cart.ShoppingCartItems.Select(i => new OrderItem
+                {
+                    ProductId = i.ProductId,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.Product.Price,
+                    Subtotal = i.Subtotal,
+                }).ToList()
+            };
+
+            order.CalculateTotalAmount();
+
+            // Salva o pedido no banco de dados
+            _context.Orders.Add(order);
+            await _context.SaveChangesAsync();
+
+            // Limpa o carrinho do usuário após a confirmação do pedido
+            _context.ShoppingCartItems.RemoveRange(cart.ShoppingCartItems);
+            await _context.SaveChangesAsync();
+
+            // Redireciona para a página de detalhes do pedido confirmado
+            return RedirectToAction("Details", "Orders", new { id = order.OrderId });
+        }        
 
     }
 }
