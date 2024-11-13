@@ -29,7 +29,7 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
 
         [DataType(DataType.PostalCode)]
         public string ZipCode { get; set; } = string.Empty;
-        public bool IsSelected { get; set; }
+        public bool? IsSelected { get; set; }
 
         // Propriedade auxiliar para retornar o endereço completo.
         public string FullAddress => $"{Street}, {Number} - {Neighborhood}, {City} - {State}, {ZipCode}, {Country}";

@@ -1,9 +1,14 @@
 ﻿@using EcommerceSolutionEFCoreMVC.Models.ViewModels
 @model IEnumerable<AddressViewModel>
 
+@{
+    ViewData["Title"] = "SelectDeliveryAddress";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
 <h2>Selecione um Endereço de Entrega</h2>
 
-<form asp-controller="ShoppingCarts" asp-action="SelectPaymentMethod" method="post">
+<form asp-controller="Addresses" asp-action="SelectDeliveryAddress" method="post">
     @foreach (var address in Model)
     {
         <div>

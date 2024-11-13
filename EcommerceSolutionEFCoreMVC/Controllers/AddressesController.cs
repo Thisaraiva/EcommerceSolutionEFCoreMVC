@@ -28,219 +28,180 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             _logger = logger;
         }
 
-        private async Task<ApplicationUser> GetCurrentUserAsync()
+        // Método auxiliar para obter o usuário atual e redirecionar caso não esteja logado
+        private async Task<ApplicationUser?> GetValidatedUserAsync()
         {
-            return await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                _logger.LogWarning("Ação não autorizada sem usuário logado.");
+                return null;
+            }
+            return user;
         }
 
+        // Método para mapear AddressViewModel para Address
+        private Address MapViewModelToModel(AddressViewModel viewModel, string userId)
+        {
+            return new Address
+            {
+                ApplicationUserId = userId,
+                Street = viewModel.Street,
+                Number = viewModel.Number,
+                Complement = viewModel.Complement,
+                Neighborhood = viewModel.Neighborhood,
+                City = viewModel.City,
+                State = viewModel.State,
+                Country = viewModel.Country,
+                ZipCode = viewModel.ZipCode
+            };
+        }
+
+        // Método para tratar Address não encontrado
+        private IActionResult AddressNotFound()
+        {
+            _logger.LogWarning("Endereço não encontrado para o usuário.");
+            return NotFound("Address not found for this user.");
+        }
 
         // GET: Addresses
         public async Task<IActionResult> Index()
         {
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
+            if (applicationUser == null) return RedirectToAction("Login", "Account");
 
-            if (applicationUser == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            var userAddresses = _context.Addresses
+            var userAddresses = await _context.Addresses
                 .Where(a => a.ApplicationUserId == applicationUser.Id)
-                .Include(a => a.ApplicationUser);
+                .ToListAsync();
 
-            return View(await userAddresses.ToListAsync());
+            return View(userAddresses);
         }
-
 
         // GET: Addresses/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
+            if (applicationUser == null) return RedirectToAction("Login", "Account");
 
             var address = await _context.Addresses
-                .Include(a => a.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.AddressId == id);
+                .FirstOrDefaultAsync(m => m.AddressId == id && m.ApplicationUserId == applicationUser.Id);
 
-            if (address == null)
-            {
-                return NotFound("Address not found for this user.");
-            }
-
-            return View(address);
+            return address == null ? AddressNotFound() : View(address);
         }
 
         // GET: Addresses/Create
         public async Task<IActionResult> Create()
         {
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
+            if (applicationUser == null) return RedirectToAction("Login", "Account");
 
-            if (applicationUser == null)
-            {
-                _logger.LogWarning("Tentativa de criação de endereço sem usuário logado.");
-                return NotFound("There is no user found");
-            }
-
-            _logger.LogInformation("Página de criação de endereço carregada para o usuário {UserId}", applicationUser.Id);
-            ViewData["ApplicationUserFullName"] = applicationUser.FullName ?? "Nome Não encontrado";
-
+            ViewData["ApplicationUserFullName"] = applicationUser.FullName;
             return View();
         }
 
         // POST: Addresses/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FullName,Street,Number,Complement,Neighborhood,City,State,Country,ZipCode")] string applicationUserId, AddressViewModel addressVM)
+        public async Task<IActionResult> Create(AddressViewModel addressVM)
         {
-            var applicationUser = await GetCurrentUserAsync();
-
-            if (applicationUser == null)
-            {
-                _logger.LogWarning("Tentativa de criação de endereço sem usuário logado.");
-                return NotFound("There is no user found");
-            }
-
-            addressVM.ApplicationUserId = applicationUser.Id;
-            _logger.LogInformation($"Usuario atribuido na view model para criar endereço: ID {addressVM.ApplicationUserId}");
+            var applicationUser = await GetValidatedUserAsync();
+            if (applicationUser == null) return RedirectToAction("Login", "Account");
 
             if (!ModelState.IsValid)
             {
-                foreach (var modelState in ModelState)
-                {
-                    foreach (var error in modelState.Value.Errors)
-                    {
-                        _logger.LogWarning("Erro no campo {Field}: {Error}", modelState.Key, error.ErrorMessage);
-                    }
-                }
-                _logger.LogWarning("Modelo de endereço inválido para o usuário {UserId}. Erros: {Errors}", applicationUser.Id, ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                LogModelStateErrors();
                 return View(addressVM);
             }
 
-            var address = new Address
-            {
-                ApplicationUserId = applicationUser.Id,
-                Street = addressVM.Street,
-                Number = addressVM.Number,
-                Complement = addressVM.Complement,
-                Neighborhood = addressVM.Neighborhood,
-                City = addressVM.City,
-                State = addressVM.State,
-                Country = addressVM.Country,
-                ZipCode = addressVM.ZipCode
-            };
-
-            var submittedValues = HttpContext.Request.Form.ToDictionary(x => x.Key, x => x.Value.FirstOrDefault());
-            _logger.LogInformation("Valores enviados pelo formulário: {Values}", submittedValues);            
+            var address = MapViewModelToModel(addressVM, applicationUser.Id);
 
             try
             {
                 _context.Add(address);
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Endereço criado com sucesso para o usuário {UserId}", applicationUser.Id);
-
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro ao tentar criar endereço para o usuário {UserId}", applicationUser.Id);
                 ModelState.AddModelError("", "Ocorreu um erro ao salvar o endereço. Tente novamente.");
-
-                ViewData["ApplicationUserFullName"] = applicationUser.FullName;                
+                return View(addressVM);
             }
-            return View(addressVM);
         }
 
         // GET: Addresses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
+            if (applicationUser == null) return RedirectToAction("Login", "Account");
 
             var address = await _context.Addresses
-                .Where(a => a.ApplicationUserId == applicationUser.Id && a.AddressId == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(a => a.AddressId == id && a.ApplicationUserId == applicationUser.Id);
 
-            if (address == null)
-            {
-                return NotFound("Address not found for this user.");
-            }
+            if (address == null) return AddressNotFound();
+
             ViewData["ApplicationUserFullName"] = applicationUser.FullName;
-
             return View(address);
         }
 
         // POST: Addresses/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AddressId,Street,Number,Complement,Neighborhood,City,State,Country,ZipCode")] AddressViewModel addressVM)
+        public async Task<IActionResult> Edit(int id, AddressViewModel addressVM)
         {
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
+            if (applicationUser == null) return RedirectToAction("Login", "Account");
 
-            if (applicationUser == null)
+            if (id != addressVM.AddressId) return AddressNotFound();
+
+            if (!ModelState.IsValid)
             {
-                return NotFound("Usuário não encontrado.");
+                LogModelStateErrors();
+                return View(addressVM);
             }
 
-            if (id != addressVM.AddressId)
+            var address = await _context.Addresses.FindAsync(id);
+            if (address == null || address.ApplicationUserId != applicationUser.Id) return AddressNotFound();
+
+            UpdateAddressFromViewModel(address, addressVM);
+
+            try
             {
-                return NotFound("Endereço não encontrado para este usuário.");
-            }
-
-            addressVM.ApplicationUserId = applicationUser.Id;
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var address = await _context.Addresses.FindAsync(id);
-                    if (address == null || address.ApplicationUserId != applicationUser.Id)
-                    {
-                        return NotFound("Endereço não encontrado para este usuário.");
-                    }
-
-                    // Atualiza as propriedades do endereço
-                    address.Street = addressVM.Street;
-                    address.Number = addressVM.Number;
-                    address.Complement = addressVM.Complement;
-                    address.Neighborhood = addressVM.Neighborhood;
-                    address.City = addressVM.City;
-                    address.State = addressVM.State;
-                    address.Country = addressVM.Country;
-                    address.ZipCode = addressVM.ZipCode;
-
-                    _context.Update(address);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AddressExists(addressVM.AddressId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _context.Update(address);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!AddressExists(addressVM.AddressId)) return NotFound();
+                else throw;
+            }
+        }
 
-            ViewData["ApplicationUserId"] = new List<SelectListItem>();
-            ViewData["ApplicationUserFullName"] = applicationUser.FullName;
+        // Método para registrar erros do ModelState
+        private void LogModelStateErrors()
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage);
+            _logger.LogWarning("Erros de validação: {Errors}", string.Join(", ", errors));
+        }
 
-            return View(addressVM);
+        private void UpdateAddressFromViewModel(Address address, AddressViewModel addressVM)
+        {
+            address.Street = addressVM.Street;
+            address.Number = addressVM.Number;
+            address.Complement = addressVM.Complement;
+            address.Neighborhood = addressVM.Neighborhood;
+            address.City = addressVM.City;
+            address.State = addressVM.State;
+            address.Country = addressVM.Country;
+            address.ZipCode = addressVM.ZipCode;
         }
 
         // GET: Addresses/Delete/5
@@ -251,7 +212,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 return NotFound();
             }
 
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
 
             var address = await _context.Addresses
                 .Include(a => a.ApplicationUser)
@@ -270,7 +231,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var applicationUser = await GetCurrentUserAsync();
+            var applicationUser = await GetValidatedUserAsync();
 
             var address = await _context.Addresses
                 .Where(a => a.AddressId == id && a.ApplicationUserId == applicationUser.Id)
@@ -323,13 +284,13 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             return View(addresses);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("SelectDeliveryAddress")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SelectDeliveryAddress(int addressId)
+        public async Task<IActionResult> SelectDeliveryAddressConfirm(int addressId)
         {
             var userId = _userManager.GetUserId(User);
 
-            // Marcar todos os endereços do usuário como não selecionados
+            // Marcar o endereço selecionado para o usuário
             var userAddresses = await _context.Addresses
                                               .Where(a => a.ApplicationUserId == userId)
                                               .ToListAsync();
@@ -339,12 +300,15 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 address.IsSelected = (address.AddressId == addressId);
             }
 
-            // Salvar a mudança no banco de dados
+            // Salvar mudanças
             await _context.SaveChangesAsync();
 
-            // Redirecionar para a seleção do método de pagamento
-            return RedirectToAction("SelectDeliveryAddress");
-        }
+            // Armazenar o endereço selecionado no TempData
+            TempData["SelectedAddressId"] = addressId;
+            TempData.Keep("SelectedAddressId");
 
+            // Redirecionar para a seleção do método de pagamento
+            return RedirectToAction("SelectPaymentMethod", "ShoppingCarts");
+        }
     }
 }

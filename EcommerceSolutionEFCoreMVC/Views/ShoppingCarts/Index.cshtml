@@ -50,7 +50,7 @@
 
         <h4>Total: @Model.ShoppingCartItems.Sum(i => i.Subtotal).ToString("C")</h4>
 
-    <form asp-controller="Addresses" asp-action="SelectDeliveryAddress" method="post">
+    <form asp-controller="Addresses" asp-action="SelectDeliveryAddress" method="get">
         <button type="submit" class="btn btn-success">Delivery Address</button>
         <a asp-controller="Home" asp-action="Index">Back to Home</a>
     </form>   

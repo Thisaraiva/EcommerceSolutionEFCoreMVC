@@ -5,7 +5,14 @@
 <h2>Resumo do Pedido</h2>
 
 <h3>Endereço de Entrega</h3>
-<p>@Model.SelectedAddress.FullAddress</p>
+@if (Model.SelectedAddress != null)
+{
+        <p>@Model.SelectedAddress.FullAddress</p>
+}
+else
+{
+        <p>Endereço de entrega não selecionado.</p>
+}
 
 <h3>Método de Pagamento</h3>
 <p>@Model.SelectedPaymentMethod</p>

@@ -21,25 +21,21 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             _userManager = userManager;
         }
 
+        private async Task<string> GetUserIdAsync() => await Task.FromResult(_userManager.GetUserId(User));
+
         private async Task<ShoppingCart> GetUserCartAsync()
-        {
-            var userId = _userManager.GetUserId(User);
+        {            
+            var userId = await GetUserIdAsync();
             return await _context.ShoppingCarts
                                  .Include(c => c.ShoppingCartItems)
                                  .ThenInclude(ci => ci.Product)
                                  .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
         }
 
-
         // GET: ShoppingCarts
         public async Task<IActionResult> Index()
         {
-            var userId = _userManager.GetUserId(User); // Obtém o ID do usuário logado
-            var shoppingCart = await _context.ShoppingCarts
-                .Include(c => c.ShoppingCartItems)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
-
+            var shoppingCart = await GetUserCartAsync();
             return View(shoppingCart);
         }
 
@@ -48,21 +44,28 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddProduct(int productId, int quantity = 1)
         {
-            var userId = _userManager.GetUserId(User);
-            var cart = await _context.ShoppingCarts
-                                     .Include(c => c.ShoppingCartItems)
-                                     .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var cart = await GetUserCartAsync();
 
             if (cart == null)
             {
                 // Cria um novo carrinho se o usuário não tiver um.
-                cart = new ShoppingCart { ApplicationUserId = userId };
+                cart = new ShoppingCart { ApplicationUserId = await GetUserIdAsync() };
                 _context.ShoppingCarts.Add(cart);
                 await _context.SaveChangesAsync();
             }
 
             var cartItem = cart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == productId);
             var product = await _context.Products.FindAsync(productId);
+
+            if (product == null)
+            {
+                return NotFound("Produto não encontrado.");
+            }
 
             if (cartItem != null)
             {
@@ -75,8 +78,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                     ShoppingCartId = cart.ShoppingCartId,
                     ProductId = productId,
                     Quantity = quantity,
-                    UnitPrice = product.Price // Atribui o preço do produto ao item
-
+                    UnitPrice = product.Price // Atribui o preço do produto ao item                    
                 };
                 _context.ShoppingCartItems.Add(cartItem);
             }
@@ -96,15 +98,12 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 return await RemoveProduct(productId); // Remove o produto se a quantidade é zero
             }
 
-            var userId = _userManager.GetUserId(User);
-            var cart = await _context.ShoppingCarts
-                                     .Include(c => c.ShoppingCartItems)
-                                     .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+            var cart = await GetUserCartAsync();
 
-            if (cart == null)
-                return NotFound();
+            if (cart == null) return NotFound();
 
             var cartItem = cart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == productId);
+
             if (cartItem != null)
             {
                 cartItem.Quantity = quantity;
@@ -119,10 +118,9 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveProduct(int productId)
         {
-            var userId = _userManager.GetUserId(User);
-            var cart = await _context.ShoppingCarts
-                                     .Include(c => c.ShoppingCartItems)
-                                     .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+            var cart = await GetUserCartAsync();
+
+            if (cart == null) return NotFound();
 
             var cartItem = cart.ShoppingCartItems.FirstOrDefault(i => i.ProductId == productId);
             if (cartItem != null)
@@ -132,45 +130,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        /*// POST: ShoppingCarts/Checkout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout()
-        {
-            var userId = _userManager.GetUserId(User);
-            var cart = await _context.ShoppingCarts
-                                     .Include(c => c.ShoppingCartItems)
-                                     .ThenInclude(i => i.Product)
-                                     .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
-
-            if (cart == null || !cart.ShoppingCartItems.Any())
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            var order = new Order
-            {
-                ApplicationUserId = userId,
-                OrderDate = DateTime.Now,
-                Status = OrderStatus.Created,
-                OrderItems = cart.ShoppingCartItems.Select(i => new OrderItem
-                {
-                    ProductId = i.ProductId,
-                    Quantity = i.Quantity,
-                    UnitPrice = i.Product.Price,
-                    Subtotal = i.Subtotal
-                }).ToList(),
-            };
-            order.CalculateTotalAmount();
-            
-            _context.Orders.Add(order);
-            _context.ShoppingCartItems.RemoveRange(cart.ShoppingCartItems);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Details", "Orders", new { id = order.OrderId });
-        }*/
+        }        
 
         public IActionResult SelectPaymentMethod()
         {
@@ -180,49 +140,70 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
 
         [HttpPost, ActionName("SelectPaymentMethod")]
         [ValidateAntiForgeryToken]
-        public IActionResult ConfirmPaymentMethod(int paymentMethodId)
+        public IActionResult SelectPaymentMethodConfirm(int paymentMethod)
         {
-            // Salvar o método de pagamento selecionado
-            TempData["SelectPaymentMethod"] = paymentMethodId;
+            // Verificar se o valor recebido é um valor válido de PaymentMethod
+            if (!Enum.IsDefined(typeof(PaymentMethod), paymentMethod))
+            {
+                ModelState.AddModelError(string.Empty, "Método de pagamento inválido.");
+                return View("SelectPaymentMethod");
+            }
+            // Armazenar o método de pagamento selecionado
+            TempData["SelectedPaymentMethodId"] = paymentMethod;
+            TempData.Keep("SelectedPaymentMethodId");
 
             // Prosseguir para a revisão do pedido
-            return RedirectToAction("SelectPaymentMethod");
+            return RedirectToAction("ReviewOrder", "ShoppingCarts");
         }
+
 
         public async Task<IActionResult> ReviewOrder()
         {
-            var userId = _userManager.GetUserId(User);
-            var cart = await _context.ShoppingCarts
-                                     .Include(c => c.ShoppingCartItems)
-                                     .ThenInclude(i => i.Product)
-                                     .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+            var cart = await GetUserCartAsync();
 
             if (cart == null || !cart.ShoppingCartItems.Any())
             {
                 return RedirectToAction(nameof(Index));
-            }
+            }                        
 
             var user = await _userManager.GetUserAsync(User);
-            var selectedAddress = await _context.Addresses
-                                                .FirstOrDefaultAsync(a => a.ApplicationUserId == userId);
 
+            // Recuperar o endereço selecionado e método de pagamento do TempData
+            int? selectedAddressId = TempData["SelectedAddressId"] as int?;
+            int? selectedPaymentMethodId = TempData["SelectedPaymentMethodId"] as int?;
+            TempData.Keep("SelectedAddressId");
+            TempData.Keep("SelectedPaymentMethodId");
+
+            // Verificação adicional para evitar exceção de valor nulo
+            if (selectedAddressId == null || selectedPaymentMethodId == null)
+            {
+                // Redireciona para a seleção de endereço e pagamento se algum estiver ausente
+                return RedirectToAction("Index", "ShoppingCarts");
+            }
+
+            var selectedAddress = await _context.Addresses
+                                                .FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id && a.AddressId == selectedAddressId);
+
+                  
             var orderSummary = new OrderSummaryViewModel
             {
-                ApplicationUserId = userId,
-                UserName = user?.UserName,
-                SelectedAddress = selectedAddress,
+                ApplicationUserId = user.Id,
+                UserName = user?.FullName,
+                SelectedAddressId = selectedAddressId.Value,
+                SelectedAddress = selectedAddress, // Adicione esta linha
                 ShoppingCart = cart,
                 TotalAmount = cart.ShoppingCartItems.Sum(i => i.Subtotal),
-                SelectedPaymentMethod = PaymentMethod.CreditCard, // ou outro método selecionado
+                SelectedPaymentMethod = (PaymentMethod)selectedPaymentMethodId, // ou outro método selecionado
                 OrderItems = cart.ShoppingCartItems.Select(i => new OrderSummaryViewModel.OrderItemSummary
                 {
                     ProductId = i.ProductId,
                     ProductName = i.Product.Name,
-                    UnitPrice = i.Product.Price,
-                    Quantity = i.Quantity                    
+                    UnitPrice = i.UnitPrice,
+                    Quantity = i.Quantity,
                 }).ToList(),
                 OrderDate = DateTime.Now
-            };
+                
+            };            
 
             return View(orderSummary);
         }
@@ -232,33 +213,33 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmOrder()
         {
-            var userId = _userManager.GetUserId(User);
-
-            // Carrega o carrinho de compras do usuário
-            var cart = await _context.ShoppingCarts
-                                      .Include(c => c.ShoppingCartItems)
-                                      .ThenInclude(i => i.Product)
-                                      .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
+            var cart = await GetUserCartAsync();
 
             if (cart == null || !cart.ShoppingCartItems.Any())
             {
                 return RedirectToAction("Index", "ShoppingCarts");
             }
 
-            /*// Obtém o método de pagamento selecionado do TempData
-            if (TempData["SelectPaymentMethod"] is not PaymentMethod selectedPaymentMethod)
+            /*// Recuperar o endereço e método de pagamento do TempData
+            int? selectedAddressId = TempData["SelectedAddressId"] as int?;
+            int? selectedPaymentMethodId = TempData["SelectedPaymentMethodId"] as int?;*/
+
+            // Verificar se o endereço e método de pagamento foram selecionados
+            if (!(TempData["SelectedAddressId"] is int selectedAddressId) ||
+                !(TempData["SelectedPaymentMethodId"] is int selectedPaymentMethodId))
             {
-                return RedirectToAction("SelectPaymentMethod");
-            }*/
+                return RedirectToAction("SelectDeliveryAddress", "Addresses");
+            }
 
             // Criação do novo pedido
             var order = new Order
             {
-                ApplicationUserId = userId,
+                ApplicationUserId = await GetUserIdAsync(),
                 OrderDate = DateTime.Now,
-                Status = OrderStatus.Created,
+                Status = OrderStatus.Created,                
+                PaymentMethod = (PaymentMethod)selectedPaymentMethodId, // Atribui o método de pagamento
                 //TotalAmount = cart.ShoppingCartItems.Sum(i => i.Subtotal),
-                PaymentMethod = /*selectedPaymentMethod*/ PaymentMethod.CreditCard, // Atribui o método de pagamento
+                AddressId = selectedAddressId,
                 OrderItems = cart.ShoppingCartItems.Select(i => new OrderItem
                 {
                     ProductId = i.ProductId,
@@ -272,15 +253,14 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
 
             // Salva o pedido no banco de dados
             _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-
             // Limpa o carrinho do usuário após a confirmação do pedido
             _context.ShoppingCartItems.RemoveRange(cart.ShoppingCartItems);
+
             await _context.SaveChangesAsync();
 
             // Redireciona para a página de detalhes do pedido confirmado
             return RedirectToAction("Details", "Orders", new { id = order.OrderId });
-        }        
+        }
 
     }
 }

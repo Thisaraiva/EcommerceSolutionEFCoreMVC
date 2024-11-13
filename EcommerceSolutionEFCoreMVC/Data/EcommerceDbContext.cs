@@ -87,6 +87,13 @@ namespace EcommerceSolutionEFCoreMVC.Data
                 .WithMany(p => p.ShoppingCartItems)
                 .HasForeignKey(sci => sci.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configurar relação entre Order e Address
+            builder.Entity<Order>()
+                .HasOne(o => o.Address)
+                .WithMany()
+                .HasForeignKey(o => o.AddressId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

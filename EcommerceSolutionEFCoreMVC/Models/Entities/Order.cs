@@ -19,6 +19,8 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
         public decimal TotalAmount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public List<OrderItem>? OrderItems { get; set; }
+        public int? AddressId { get; set; }
+        public Address? Address { get; set; }
 
         public void CalculateTotalAmount()
         {

@@ -3,11 +3,11 @@
 
 <h2>Escolha o Método de Pagamento</h2>
 
-<form asp-controller="ShoppingCarts" asp-action="ReviewOrder" method="post">
-    @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
+<form asp-controller="ShoppingCarts" asp-action="SelectPaymentMethod" method="post">
+    @foreach (var method in Enum.GetValues(typeof(PaymentMethod)).Cast<PaymentMethod>())
     {
         <div>
-            <input type="radio" name="paymentMethod" value="@method" required />
+            <input type="radio" name="paymentMethod" value="@Convert.ToInt32(method)" required />
             <label>@method</label>
         </div>
     }

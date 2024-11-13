@@ -10,7 +10,8 @@ namespace EcommerceSolutionEFCoreMVC.Models.ViewModels
         // Informações do usuário e endereço de entrega
         public string ApplicationUserId { get; set; }        
         public string UserName { get; set; }
-        public Address SelectedAddress { get; set; }
+        public int? SelectedAddressId { get; set; }
+        public Address? SelectedAddress { get; set; }
 
         public ShoppingCart ShoppingCart { get; set; }
 
@@ -21,7 +22,7 @@ namespace EcommerceSolutionEFCoreMVC.Models.ViewModels
         public decimal TotalAmount { get; set; }
 
         // Método de pagamento selecionado
-        public PaymentMethod SelectedPaymentMethod { get; set; }
+        public PaymentMethod? SelectedPaymentMethod { get; set; }
 
         // Data do pedido, para visualização
         public DateTime OrderDate { get; set; } = DateTime.Now;        
