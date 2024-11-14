@@ -93,3 +93,58 @@ footer {
     width: 100%;
 }
 
+/* Ajuste do tamanho da fonte do título */
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Estilos dos cards do carrinho */
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+    .card img {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        height: 200px;
+        object-fit: contain;
+    }
+
+.card-body {
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.btn-primary, .btn-danger {
+    width: 100%;
+}
+
+.btn-link {
+    font-weight: bold;
+}
+
+/* Ajustes para o total do carrinho */
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+    .bg-light h4 {
+        font-weight: 600;
+        color: #555;
+    }
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.alert-link {
+    font-weight: 600;
+}
