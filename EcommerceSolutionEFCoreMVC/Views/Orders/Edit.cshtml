@@ -37,9 +37,11 @@
             </div>
             <div class="form-group">
                 <label asp-for="TotalAmount" class="control-label"></label>
-                <input asp-for="TotalAmount" class="form-control" />
+                <input type="text" class="form-control" value="@Model.TotalAmount.ToString("C", System.Globalization.CultureInfo.CurrentCulture)" readonly />
+                <input type="hidden" asp-for="TotalAmount" />
                 <span asp-validation-for="TotalAmount" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="PaymentMethod" class="control-label"></label>
                 <input asp-for="PaymentMethod" class="form-control" />

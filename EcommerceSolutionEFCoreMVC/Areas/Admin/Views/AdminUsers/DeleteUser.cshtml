@@ -1,0 +1,30 @@
+﻿@using EcommerceSolutionEFCoreMVC.Models.Entities
+@model ApplicationUser
+
+@{
+    ViewData["Title"] = "Delete User";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h1 class="bg-danger text-white p-3 rounded">Confirm User Deletion</h1>
+    <div class="alert alert-warning">
+        <strong>Warning!</strong> You are about to delete the following user:
+    </div>
+    <dl class="row">
+        <dt class="col-sm-3">User ID</dt>
+        <dd class="col-sm-9">@Model.Id</dd>
+
+        <dt class="col-sm-3">Username</dt>
+        <dd class="col-sm-9">@Model.UserName</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+    </dl>
+    <div class="d-flex justify-content-between">
+        <form asp-action="ConfirmDeleteUser" asp-route-id="@Model.Id" method="post">
+            <button type="submit" class="btn btn-danger">Confirm Deletion</button>
+        </form>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</div>

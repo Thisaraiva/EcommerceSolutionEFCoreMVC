@@ -31,6 +31,7 @@ namespace EcommerceSolutionEFCoreMVC.Areas.Admin.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Required] string name)
         {
             if(ModelState.IsValid)
@@ -38,6 +39,7 @@ namespace EcommerceSolutionEFCoreMVC.Areas.Admin.Controllers
                 IdentityResult result = await roleManager.CreateAsync(new IdentityRole(name));
                 if(result.Succeeded)
                 {
+                    TempData["Success"] = "Role created successfully!";
                     return RedirectToAction("Index");
                 }
                 else
@@ -89,7 +91,7 @@ namespace EcommerceSolutionEFCoreMVC.Areas.Admin.Controllers
                             Errors(result);
                     }
                 }
-                foreach (string userId in model.DeleteIds ?? new string[] { })
+                foreach (string userId in model.DeleteIds ?? Array.Empty<string>())
                 {
                     ApplicationUser user = await userManager.FindByIdAsync(userId);
                     if (user != null)
@@ -115,7 +117,7 @@ namespace EcommerceSolutionEFCoreMVC.Areas.Admin.Controllers
                 ModelState.AddModelError("", "Role not found!");
                 return View("Index", roleManager.Roles);
             }
-            return View("Index", role);
+            return View(role);
         }
 
         [HttpPost, ActionName("Delete")]

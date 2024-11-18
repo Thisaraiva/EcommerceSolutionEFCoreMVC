@@ -1,18 +1,21 @@
 ﻿@model string
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Role";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
+<div class="container mt-4">
+    <h1 class="bg-info text-white p-3 rounded">Create Role</h1>
+    <a asp-action="Index" class="btn btn-secondary mb-3">Return</a>
 
-<h1 class="btg-info text-white">Create Role</h1>
-<a asp-action="Index" class="btn btn-secondary">Return</a>
-<div asp-validation-sumary="All" class="text-danger"></div>
+    <div asp-validation-summary="All" class="alert alert-danger">Teste</div>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label for="name">Name: </label>
-        <input name="name" class="form-control" />
-    </div>
-</form>
+    <form asp-action="Create" method="post" class="form-group">
+        <div class="mb-3">
+            <label for="name" class="form-label">Role Name</label>
+            <input name="name" id="name" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-success">Create</button>
+    </form>
+</div>
