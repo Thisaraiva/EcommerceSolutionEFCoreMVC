@@ -1,73 +1,48 @@
 ﻿@model EcommerceSolutionEFCoreMVC.Models.Entities.Address
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Endereço";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Detalhes do Endereço</h1>
 
-<div>
-    <h4>Address</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ApplicationUser.FullName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ApplicationUser.FullName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Street)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Street)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Number)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Number)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Complement)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Complement)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Neighborhood)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Neighborhood)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.City)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.City)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.State)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.State)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Country)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ZipCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ZipCode)
-        </dd>
-    </dl>
+<div class="card mb-3">
+    <div class="card-header">
+        <h4>@Model.ApplicationUser.FullName</h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Rua</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Street)</dd>
+
+            <dt class="col-sm-3">Número</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Number)</dd>
+
+            <dt class="col-sm-3">Complemento</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Complement)</dd>
+
+            <dt class="col-sm-3">Bairro</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Neighborhood)</dd>
+
+            <dt class="col-sm-3">Cidade</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.City)</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.State)</dd>
+
+            <dt class="col-sm-3">País</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Country)</dd>
+
+            <dt class="col-sm-3">CEP</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ZipCode)</dd>
+        </dl>
+
+        <hr />        
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.AddressId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model?.AddressId" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar para a Lista</a>
 </div>

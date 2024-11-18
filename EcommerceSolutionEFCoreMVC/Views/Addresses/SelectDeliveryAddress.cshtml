@@ -6,17 +6,17 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Selecione um Endereço de Entrega</h2>
+<h2 class="text-center">Selecione um Endereço de Entrega</h2>
 
-<form asp-controller="Addresses" asp-action="SelectDeliveryAddress" method="post">
+<form asp-controller="Addresses" asp-action="SelectDeliveryAddress" method="post" class="container my-4">
     @foreach (var address in Model)
     {
-        <div>
-            <input type="radio" name="addressId" value="@address.AddressId" required />
-            <label>@address.FullAddress</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="addressId" value="@address.AddressId" required />
+            <label class="form-check-label">@address.FullAddress</label>
         </div>
     }
-    <button type="submit" class="btn btn-primary mt-2">Selecionar Endereço</button>
+    <button type="submit" class="btn btn-primary mt-3">Selecionar Endereço</button>
 </form>
 
-<a asp-action="Create" asp-controller="Addresses" class="btn btn-secondary mt-2">Adicionar Novo Endereço</a>
+<a asp-action="Create" asp-controller="Addresses" class="btn btn-secondary mt-2 my-4">Adicionar Novo Endereço</a>

@@ -1,15 +1,16 @@
 ﻿@using EcommerceSolutionEFCoreMVC.Models.Enums
 @model PaymentMethod
 
-<h2>Escolha o Método de Pagamento</h2>
+<h2 class="text-center">Escolha o Método de Pagamento</h2>
 
-<form asp-controller="ShoppingCarts" asp-action="SelectPaymentMethod" method="post">
+<form asp-controller="ShoppingCarts" asp-action="SelectPaymentMethod" method="post" class="container my-4">
     @foreach (var method in Enum.GetValues(typeof(PaymentMethod)).Cast<PaymentMethod>())
     {
-        <div>
-            <input type="radio" name="paymentMethod" value="@Convert.ToInt32(method)" required />
-            <label>@method</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="paymentMethod" value="@Convert.ToInt32(method)" required />
+            <label class="form-check-label">@method</label>
         </div>
     }
-    <button type="submit" class="btn btn-primary">Selecionar Pagamento</button>
+    <button type="submit" class="btn btn-primary mt-3">Selecionar Pagamento</button>
 </form>
+

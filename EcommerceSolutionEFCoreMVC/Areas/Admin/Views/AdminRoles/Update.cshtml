@@ -1,6 +1,11 @@
 ﻿@using EcommerceSolutionEFCoreMVC.Models.Entities
 @model RoleEdit
 
+@{
+    ViewData["Title"] = "Update";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
 <h1 class="bg-info text-white">Update Role</h1>
 <a asp-action="Index" class="btn btn-secondary">Return</a>
 <div aps-validation-summary="All" class="text-danger"></div>

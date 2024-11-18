@@ -2,9 +2,11 @@
 @using EcommerceSolutionEFCoreMVC.Models
 @model OrderSummaryViewModel
 
-<h2>Resumo do Pedido</h2>
+<h2 class="text-center">Resumo do Pedido</h2>
 
-<h3>Endereço de Entrega</h3>
+<div class="container my-4">
+    <div class="mb-3">
+        <h4>Endereço de Entrega</h4>
 @if (Model.SelectedAddress != null)
 {
         <p>@Model.SelectedAddress.FullAddress</p>
@@ -13,33 +15,39 @@ else
 {
         <p>Endereço de entrega não selecionado.</p>
 }
+    </div>
 
-<h3>Método de Pagamento</h3>
-<p>@Model.SelectedPaymentMethod</p>
+    <div class="mb-3">
+        <h4>Método de Pagamento</h4>
+        <p>@Model.SelectedPaymentMethod</p>
+    </div>
 
-<h3>Itens do Pedido</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Produto</th>
-            <th>Quantidade</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.OrderItems)
-        {
-            <tr>
-                <td>@item.ProductName</td>
-                <td>@item.Quantity</td>
-                <td>@item.Subtotal.ToString("C")</td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <h4>Itens do Pedido</h4>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderItems)
+                {
+                    <tr>
+                        <td class="text-start">@item.ProductName</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Subtotal.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-<h4>Total: @Model.ShoppingCart.ShoppingCartItems.Sum(i => i.Subtotal).ToString("C")</h4>
+    <h4 class="text-end">Total: @Model.ShoppingCart.ShoppingCartItems.Sum(i => i.Subtotal).ToString("C")</h4>
 
-<form asp-controller="ShoppingCarts" asp-action="ConfirmOrder" method="post">
-    <button type="submit" class="btn btn-success">Confirmar Pedido</button>
-</form>
+    <form asp-controller="ShoppingCarts" asp-action="ConfirmOrder" method="post">
+        <button type="submit" class="btn btn-success">Confirmar Pedido</button>
+    </form>
+</div>

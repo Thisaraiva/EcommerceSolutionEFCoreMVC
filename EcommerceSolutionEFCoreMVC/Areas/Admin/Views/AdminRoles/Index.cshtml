@@ -1,20 +1,21 @@
 ﻿@model IEnumerable<IdentityRole>
 @{
     ViewData["Title"] = "ROLES";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
 }
 
 <h1 class="bg-info text-white">Roles</h1>
 <a asp-action="Create" class="btn btn-secondary">Create Role</a>
 
 <table class="table table-sm table-bordered table-bordered">
-    <tr><th>ID</th><th>Nome</th></tr>
+    <tr><th>Role</th><th>Edit</th><th>Delete</th></tr>
     @foreach(var role in Model)
     {
-        <tr>
-            <td>@role.Id</td>
+        <tr>            
             <td>@role.Name</td>
-            <td i-role="@role.Id"></td>
-            <td><a class="btn btn-sm btn-primary" asp-action="Update" asp-route-id="@role.Id">Edit</a></td>
+            
+            <td><a class="btn btn-sn btn-primary" asp-action="Update" asp-route-id="@role.Id">Edit</a></td>
             <td>
                 <form asp-action="Delete" asp-route-id="@role.Id" method="get">
                     <button type="submit" class="btn btn-sm btn-danger">

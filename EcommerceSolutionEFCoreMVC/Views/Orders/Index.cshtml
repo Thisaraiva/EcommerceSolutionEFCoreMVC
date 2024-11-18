@@ -1,55 +1,38 @@
 ﻿@model IEnumerable<EcommerceSolutionEFCoreMVC.Models.Entities.Order>
 
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Orders";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Orders</h1>
 
-<p>
-    
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ApplicationUser.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OrderDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalAmount)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ApplicationUser.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @item.TotalAmount.ToString("C")
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.OrderId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrderId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrderId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.ApplicationUser.FullName)</th>
+                <th>@Html.DisplayNameFor(model => model.OrderDate)</th>
+                <th>@Html.DisplayNameFor(model => model.Status)</th>
+                <th>@Html.DisplayNameFor(model => model.TotalAmount)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => order.ApplicationUser.FullName)</td>
+                    <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                    <td>@Html.DisplayFor(modelItem => order.Status)</td>
+                    <td>@order.TotalAmount.ToString("C")</td>
+                    <td>                        
+                        <a asp-action="Edit" asp-route-id="@order.OrderId" class="btn btn-primary">Editar</a>
+                        <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-info">Detalhes</a>
+                        <a asp-action="Delete" asp-route-id="@order.OrderId" class="btn btn-danger">Excluir</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

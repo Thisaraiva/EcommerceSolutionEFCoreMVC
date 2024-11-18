@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EcommerceSolutionEFCoreMVC.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header>
@@ -19,19 +21,19 @@
                 </button>                
                 <div class="collapse navbar-collapse mx-2" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item  mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-light" asp-area="Admin" asp-controller="Admin" asp-action="Index">Home</a>
                         <li/>                        
-                        <li class="nav-item mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-light" asp-area="Admin" asp-controller="AdminRoles" asp-action="Index">Manage Roles</a>
                         <li />
-                        <li class="nav-item mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-light" asp-area="Admin" asp-controller="AdminUsers" asp-action="Index">Manage Users</a>
                         </li>
-                        <li class="nav-item mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-light" asp-area="Admin" asp-controller="Categories" asp-action="Index">Categories</a>
                         </li>
-                        <li class="nav-item mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
                         </li>
                     </ul>
@@ -39,15 +41,15 @@
                 </div>            
         </nav>
     </header>
-    <div class="container">     
+    <div class="container mt-4 flex-grow-1">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
      </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - EcommerceSolutionEFCoreMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="bg-dark text-white py-3 mt-4">
+        <div class="container text-center">
+            &copy; 2024 - EcommerceSolutionEFCoreMVC - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-light">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

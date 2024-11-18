@@ -122,9 +122,9 @@ h1 {
     font-weight: 500;
 }
 
-.btn-primary, .btn-danger {
+/*.btn-primary, .btn-danger {
     width: 100%;
-}
+}*/
 
 .btn-link {
     font-weight: bold;
@@ -147,4 +147,55 @@ h1 {
 
 .alert-link {
     font-weight: 600;
+}
+
+/* Estilos para o layout do carrinho */
+.card-body .button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+/* Melhor alinhamento de botões e inputs */
+form.d-flex.align-items-center .form-control {
+    max-width: 60px;
+    margin-right: 10px;
+}
+
+.btn {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+}
+
+/* Estilos para tabelas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+    table th, table td {
+        padding: 12px;
+        text-align: center;
+    }
+
+    table th {
+        background-color: #f1f1f1;
+        font-weight: bold;
+    }
+
+.table-responsive table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.alert-warning {
+    background-color: #fff8e1;
+    color: #856404;
+    border-radius: 5px;
+}
+
+.btn-link {
+    color: #333;
+    font-weight: bold;
 }

@@ -7,9 +7,9 @@ namespace EcommerceSolutionEFCoreMVC.Models.Entities
 {
     public class Order
     {
-        public int OrderId { get; set; }
+        public int OrderId { get; set; }        
         public string ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
         [Display(Name = "Date")]
         [DataType(DataType.Date)]
         public DateTime OrderDate { get; set; }

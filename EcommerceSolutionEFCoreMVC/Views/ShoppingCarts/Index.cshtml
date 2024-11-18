@@ -30,12 +30,12 @@
                                 <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control me-2" style="width: 70px;" />
                                 <button type="submit" class="btn btn-sm btn-primary">Atualizar</button>
                             </form>
-                            <div class="container col-md-6">
-                                <form asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" method="post" class="mt-2">
+                            <div class="button-group mt-3 container">
+                                <form asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" method="post">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
-                                    <button type="submit" class="btn btn-sm btn-primary">Details</button>
+                                    <button type="submit" class="btn btn-sm btn-primary">View Details</button>
                                 </form>
-                                <form asp-action="RemoveProduct" method="post" class="mt-2">
+                                <form asp-action="RemoveProduct" method="post">
                                     <input type="hidden" name="productId" value="@item.ProductId" />
                                     <button type="submit" class="btn btn-sm btn-danger">Remover</button>
                                 </form>

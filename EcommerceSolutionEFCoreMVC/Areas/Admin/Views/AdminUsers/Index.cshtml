@@ -1,6 +1,11 @@
 ﻿@using EcommerceSolutionEFCoreMVC.Models.Entities;
 @model IEnumerable<ApplicationUser>
 
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
 <h1>Users</h1>
 
 @if (Model.Any())

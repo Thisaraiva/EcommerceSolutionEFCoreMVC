@@ -1,68 +1,74 @@
 ﻿@model EcommerceSolutionEFCoreMVC.Models.Entities.Order
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Order Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<h1>Order Details - Order #@Model.OrderId</h1>
 
-<div>
-    <h4>Order</h4>
-    <hr />
+<div class="order-summary card p-3">
+    <h4>Order Summary</h4>
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ApplicationUser.FullName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ApplicationUser.FullName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.OrderDate)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.TotalAmount)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.TotalAmount)
+        <dt class="col-sm-3">Order Number</dt>
+        <dd class="col-sm-9">@Model.OrderId</dd>
+
+        <dt class="col-sm-3">Customer</dt>
+        <dd class="col-sm-9">@Model.ApplicationUser.FullName (@Model.ApplicationUser.UserName)</dd>
+
+        <dt class="col-sm-3">Order Date</dt>
+        <dd class="col-sm-9">@Model.OrderDate.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+
+        <dt class="col-sm-3">Total Amount</dt>
+        <dd class="col-sm-9">@Model.TotalAmount.ToString("C")</dd>
+
+        <dt class="col-sm-3">Payment Method</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.PaymentMethod)</dd>
+
+        <dt class="col-sm-3">Shipping Address</dt>
+        <dd class="col-sm-9">
+            @Model.Address?.Street, @Model.Address?.Number<br />
+            @Model.Address?.City, @Model.Address?.State, @Model.Address?.ZipCode<br />
+            @Model.Address?.Country
         </dd>
     </dl>
 </div>
 
 <h4>Order Items</h4>
 <hr />
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product Name</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.OrderItems)
-        {
+<div class="table-responsive card p-3">
+    <table class="table">
+        <thead>
             <tr>
-                <td>@item.Product.Name</td>
-                <td>@item.Quantity</td>
-                <td>@item.UnitPrice.ToString("C")</td>
-                <td>@item.Subtotal.ToString("C")</td>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Subtotal</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderItems)
+            {
+                <tr>
+                    <td class="text-start">@item.Product.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.UnitPrice.ToString("C")</td>
+                    <td>@((item.Quantity * item.UnitPrice).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-right font-weight-bold">Total</td>
+                <td class="font-weight-bold">@Model.TotalAmount.ToString("C")</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.OrderId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="back-to-list mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>

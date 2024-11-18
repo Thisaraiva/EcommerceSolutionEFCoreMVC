@@ -1,4 +1,11 @@
 ﻿@model string
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
 <h1 class="btg-info text-white">Create Role</h1>
 <a asp-action="Index" class="btn btn-secondary">Return</a>
 <div asp-validation-sumary="All" class="text-danger"></div>
