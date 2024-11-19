@@ -1,0 +1,70 @@
+﻿@using EcommerceSolutionEFCoreMVC.Models.Enums
+@using EcommerceSolutionEFCoreMVC.Areas.Admin.Models.ViewModels
+@using System.ComponentModel.DataAnnotations
+@model ReportDataViewModel
+@{
+    ViewData["Title"] = "Manager Panel";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <h1 class="text-center mb-4">Manager Panel</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <h4>Filters</h4>
+            <form id="filterForm">
+                <div class="mb-3">
+                    <label for="status" class="form-label">Order Status</label>
+                    @Html.DropDownList("status", (List<SelectListItem>)ViewData["OrderStatusList"], "All", new { @class = "form-select", id = "status" })
+                </div>
+                <div class="mb-3">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <input type="date" id="startDate" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <input type="date" id="endDate" class="form-control" />
+                </div>
+                <button type="button" class="btn btn-primary" id="applyFilters">Apply Filters</button>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <h4>Reports</h4>
+            <div id="reportSection">
+                @Html.Partial("_ReportsPartial", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#applyFilters').click(function () {
+    const filters = {
+        Status: $('#status').val(),
+        StartDate: $('#startDate').val(),
+        EndDate: $('#endDate').val()
+    };
+
+    if (filters.StartDate && filters.EndDate && new Date(filters.StartDate) > new Date(filters.EndDate)) {
+        alert('Start Date cannot be later than End Date.');
+        return;
+    }
+
+    $.ajax({
+        url: '/Admin/ManagerPanel/FilterReports',
+        type: 'POST',
+        data: JSON.stringify(filters),
+        contentType: "application/json; charset=utf-8",
+        success: function (data) {
+            $('#reportSection').html(data);
+        },
+        error: function (xhr, status, error) {
+            alert('Error applying filters: ' + (xhr.responseText || error));
+        }
+    });
+});
+
+    </script>
+}

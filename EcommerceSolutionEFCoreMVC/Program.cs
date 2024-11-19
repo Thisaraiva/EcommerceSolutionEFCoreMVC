@@ -57,6 +57,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var cultureInfo = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

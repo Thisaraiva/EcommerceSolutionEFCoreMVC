@@ -146,31 +146,8 @@ Order order)
                     {
                         throw;
                     }
-                }
-                //return RedirectToAction(nameof(Index));
-            }
-            /*
-            // Recarregar os dados caso o ModelState não seja válido
-            Console.WriteLine($"Edit: ModelState invalid for Order {id}. Errors: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
-            var existingOrder = await _context.Orders
-                .Include(o => o.ApplicationUser)                
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (existingOrder != null)
-            {
-                ViewBag.StatusOptions = Enum.GetValues(typeof(OrderStatus))
-                    .Cast<OrderStatus>()
-                    .Select(status => new SelectListItem
-                    {
-                        Value = ((int)status).ToString(),
-                        Text = status.ToString(),
-                        Selected = order.Status == status
-                    }).ToList();
-
-                ViewData["ApplicationUserId"] = existingOrder.ApplicationUserId;
-                ViewData["UserName"] = existingOrder.ApplicationUser?.FullName ?? "Unknown User";
-
-            }*/
+                }                
+            }            
             return View(order);
         }
 

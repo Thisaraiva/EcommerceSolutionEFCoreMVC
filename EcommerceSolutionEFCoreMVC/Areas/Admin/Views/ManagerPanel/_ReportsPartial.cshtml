@@ -1,0 +1,97 @@
+﻿@using EcommerceSolutionEFCoreMVC.Areas.Admin.Models.ViewModels
+@model ReportDataViewModel
+
+<div class="card p-3 shadow-sm">
+    <p><strong>Total Orders:</strong> @Model.TotalOrders</p>
+    <p><strong>Total Sales:</strong> @Model.TotalSales.ToString("C")</p>
+
+    <h5>Sales by Category:</h5>
+    <ul>
+        @if (Model.SalesByCategory != null && Model.SalesByCategory.Any())
+        {
+            foreach (var category in Model.SalesByCategory)
+            {
+                <li>@category.Key: @category.Value.ToString("C")</li>
+            }
+        }
+        else
+        {
+            <li>No data available</li>
+        }
+    </ul>
+
+    <h5>Sales by Product:</h5>
+    <ul>
+        @if (Model.SalesByProduct != null && Model.SalesByProduct.Any())
+        {
+            foreach (var product in Model.SalesByProduct)
+            {
+                <li>@product.Key: @product.Value units</li>
+            }
+        }
+        else
+        {
+            <li>No data available</li>
+        }
+    </ul>
+
+    <h5>Sales by State:</h5>
+    <ul>
+        @if (Model.SalesByState != null && Model.SalesByState.Any())
+        {
+            foreach (var state in Model.SalesByState)
+            {
+                <li>@state.Key: @state.Value.ToString("C")</li>
+            }
+        }
+        else
+        {
+            <li>No data available</li>
+        }
+    </ul>
+
+    <h5>Sales Total by Product:</h5>
+    <ul>
+        @if (Model.SalesTotalByProduct != null && Model.SalesTotalByProduct.Any())
+        {
+            foreach (var product in Model.SalesTotalByProduct)
+            {
+                <li>@product.Key: @product.Value.ToString("C")</li>
+            }
+        }
+        else
+        {
+            <li>No data available</li>
+        }
+    </ul>
+    <h5>Orders by Status</h5>
+    <ul>
+        @if (Model.OrdersByStatus != null && Model.OrdersByStatus.Any())
+        {
+            foreach (var status in Model.OrdersByStatus)
+            {
+                <li>@status.Key: @status.Value orders</li>
+            }
+        }
+        else
+        {
+            <li>No data available</li>
+        }
+    </ul>
+
+    <h5>Total Value by Status</h5>
+    <ul>
+        @if (Model.TotalValueByStatus != null && Model.TotalValueByStatus.Any())
+        {
+            foreach (var status in Model.TotalValueByStatus)
+            {
+                <li>@status.Key: @status.Value.ToString("C")</li>
+            }
+        }
+        else
+        {
+            <li>No data available</li>
+        }
+    </ul>
+
+</div>

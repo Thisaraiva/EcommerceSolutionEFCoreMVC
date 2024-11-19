@@ -218,11 +218,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             if (cart == null || !cart.ShoppingCartItems.Any())
             {
                 return RedirectToAction("Index", "ShoppingCarts");
-            }
-
-            /*// Recuperar o endereço e método de pagamento do TempData
-            int? selectedAddressId = TempData["SelectedAddressId"] as int?;
-            int? selectedPaymentMethodId = TempData["SelectedPaymentMethodId"] as int?;*/
+            }            
 
             // Verificar se o endereço e método de pagamento foram selecionados
             if (!(TempData["SelectedAddressId"] is int selectedAddressId) ||
