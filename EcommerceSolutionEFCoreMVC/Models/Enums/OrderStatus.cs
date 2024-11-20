@@ -22,8 +22,8 @@ namespace EcommerceSolutionEFCoreMVC.Models.Enums
         [Display(Name = "Delivered")]
         Delivered = 5,
 
-        [Display(Name = "Canceled")]
-        Canceled = 6,
+        [Display(Name = "Cancelled")]
+        Cancelled = 6,
 
         [Display(Name = "Returned")]
         Returned = 7,

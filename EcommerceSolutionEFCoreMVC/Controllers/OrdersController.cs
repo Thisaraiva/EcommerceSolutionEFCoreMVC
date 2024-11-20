@@ -109,7 +109,7 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("OrderId,ApplicationUserId,OrderDate,Status,TotalAmount,PaymentMethod,AddressId")]
-Order order)
+            Order order)
         {
             if (id != order.OrderId)
             {                
@@ -194,5 +194,35 @@ Order order)
         {
             return _context.Orders.Any(e => e.OrderId == id);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
+
+            if (order == null || (!User.IsInRole("Admin") && order.ApplicationUserId != _userManager.GetUserId(User)))
+            {
+                return Unauthorized();
+            }
+
+            // Verificar se o pedido já foi cancelado ou entregue
+            if (order.Status == OrderStatus.Delivered ||
+                order.Status == OrderStatus.Shipped ||
+                order.Status == OrderStatus.Cancelled)
+            {
+                ModelState.AddModelError("", "This order cannot be cancelled.");
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            // Atualizar o status para "Cancelled"
+            order.Status = OrderStatus.Cancelled;
+            _context.Update(order);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Order has been successfully cancelled.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
     }
 }

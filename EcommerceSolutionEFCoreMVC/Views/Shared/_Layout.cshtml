@@ -40,6 +40,21 @@
     
     <div class="container mt-4 flex-grow-1">
         <main role="main" class="pb-3">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success d-flex align-items-center" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <div>@TempData["SuccessMessage"]</div>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>@TempData["ErrorMessage"]</div>
+                </div>
+            }
             @RenderBody()
         </main>
     </div>    
