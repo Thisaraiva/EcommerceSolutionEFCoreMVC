@@ -60,6 +60,13 @@ namespace EcommerceSolutionEFCoreMVC.Services.Interfaces
             // Lógica de filtro com base nos parâmetros
             var query = _context.Orders.AsQueryable();
 
+            // Aplicar datas padrão (últimos 30 dias) se StartDate ou EndDate forem nulos
+            var defaultStartDate = DateTime.UtcNow.AddDays(-30);
+            var defaultEndDate = DateTime.UtcNow;
+
+            var startDate = filters.StartDate ?? defaultStartDate;
+            var endDate = filters.EndDate ?? defaultEndDate;
+
             if (!string.IsNullOrEmpty(filters.Status) && Enum.TryParse<OrderStatus>(filters.Status, out var statusEnum))            
                 query = query.Where(o => o.Status == statusEnum);
 

@@ -8,43 +8,51 @@
 }
 
 <div class="container">
-    <h1 class="text-center mb-4">Manager Panel</h1>
-
+    <h1 class="text-center mb-5">Manager Panel</h1>
+    
     <div class="row">
-        <div class="col-md-4">
-            <h4>Filters</h4>
-            <form id="filterForm">
-                <div class="mb-3">
-                    <label for="status" class="form-label">Order Status</label>
-                    @Html.DropDownList("status", (List<SelectListItem>)ViewData["OrderStatusList"], "All", new { @class = "form-select", id = "status" })
-                </div>
-                <div class="mb-3">
-                    <label for="startDate" class="form-label">Start Date</label>
-                    <input type="date" id="startDate" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label for="endDate" class="form-label">End Date</label>
-                    <input type="date" id="endDate" class="form-control" />
-                </div>
-                <button type="button" class="btn btn-primary" id="applyFilters">Apply Filters</button>
-            </form>
+        <!-- Filtro -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title">Filters</h5>
+                <form id="filterForm">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Order Status</label>
+                        @Html.DropDownList("status", (List<SelectListItem>)ViewData["OrderStatusList"], "All", new { @class = "form-select", id = "status" })
+                    </div>
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" id="startDate" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" id="endDate" class="form-control" />
+                    </div>
+                    <button type="button" class="btn btn-primary w-100" id="applyFilters">Apply Filters</button>
+                </form>
+            </div>
         </div>
+        
+        <!-- Relatórios -->
         <div class="col-md-8">
-            <h4>Reports</h4>
-            <div id="reportSection">
-                @Html.Partial("_ReportsPartial", Model)
+            <div class="card shadow-sm p-4">
+                <h5 class="card-title">Reports</h5>
+                <div id="reportSection">
+                    @Html.Partial("_ReportsPartial", Model)
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script>
         $('#applyFilters').click(function () {
     const filters = {
         Status: $('#status').val(),
-        StartDate: $('#startDate').val(),
-        EndDate: $('#endDate').val()
+        StartDate: $('#startDate').val() || null,
+        EndDate: $('#endDate').val() || null
     };
 
     if (filters.StartDate && filters.EndDate && new Date(filters.StartDate) > new Date(filters.EndDate)) {
