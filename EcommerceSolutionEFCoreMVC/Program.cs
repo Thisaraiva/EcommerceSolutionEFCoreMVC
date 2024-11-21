@@ -1,11 +1,10 @@
 using EcommerceSolutionEFCoreMVC.Data;
 using EcommerceSolutionEFCoreMVC.Models.Entities;
 using EcommerceSolutionEFCoreMVC.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using EcommerceSolutionEFCoreMVC.Models.Configurations;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using System.Configuration;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +57,9 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<ISeedUserRoleInitial, SeedUserRoleInitial>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+//builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var cultureInfo = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
@@ -100,6 +102,11 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "testemail",
+    pattern: "{controller=TestEmail}/{action=SendTestEmail}");
+
 
 app.Run();
 

@@ -6,6 +6,7 @@ using EcommerceSolutionEFCoreMVC.Models.Entities;
 using EcommerceSolutionEFCoreMVC.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using EcommerceSolutionEFCoreMVC.Services.Interfaces;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers
 {
@@ -14,11 +15,13 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
     {
         private readonly EcommerceDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public OrdersController(EcommerceDbContext context, UserManager<ApplicationUser> userManager)
+        public OrdersController(EcommerceDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         // GET: Orders
@@ -133,7 +136,12 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 try
                 {
                     _context.Update(order);
-                    await _context.SaveChangesAsync();                    
+                    await _context.SaveChangesAsync();
+
+                    // Enviar e-mail de atualização de status
+                    var user = await _userManager.FindByIdAsync(order.ApplicationUserId);
+                    await _emailService.SendOrderStatusUpdateEmail(user.Email, order);
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
@@ -149,8 +157,40 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
                 }                
             }            
             return View(order);
-        }
+        }        
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
+
+            if (order == null || (!User.IsInRole("Admin") && order.ApplicationUserId != _userManager.GetUserId(User)))
+            {
+                return Unauthorized();
+            }
+
+            // Verificar se o pedido já foi cancelado ou entregue
+            if (order.Status == OrderStatus.Delivered ||
+                order.Status == OrderStatus.Shipped ||
+                order.Status == OrderStatus.Cancelled)
+            {
+                ModelState.AddModelError("", "This order cannot be cancelled.");
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            // Atualizar o status para "Cancelled"
+            order.Status = OrderStatus.Cancelled;
+            _context.Update(order);
+            await _context.SaveChangesAsync();
+
+            // Enviar e-mail de atualização de status
+            var user = await _userManager.FindByIdAsync(order.ApplicationUserId);
+            await _emailService.SendOrderStatusUpdateEmail(user.Email, order);
+
+            TempData["SuccessMessage"] = "Order has been successfully cancelled.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
 
         [Authorize(Roles = "Admin")]
         // GET: Orders/Delete/5
@@ -193,35 +233,6 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
         private bool OrderExists(int id)
         {
             return _context.Orders.Any(e => e.OrderId == id);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancel(int id)
-        {
-            var order = await _context.Orders.FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (order == null || (!User.IsInRole("Admin") && order.ApplicationUserId != _userManager.GetUserId(User)))
-            {
-                return Unauthorized();
-            }
-
-            // Verificar se o pedido já foi cancelado ou entregue
-            if (order.Status == OrderStatus.Delivered ||
-                order.Status == OrderStatus.Shipped ||
-                order.Status == OrderStatus.Cancelled)
-            {
-                ModelState.AddModelError("", "This order cannot be cancelled.");
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            // Atualizar o status para "Cancelled"
-            order.Status = OrderStatus.Cancelled;
-            _context.Update(order);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Order has been successfully cancelled.";
-            return RedirectToAction(nameof(Details), new { id });
         }
 
     }

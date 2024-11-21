@@ -113,7 +113,7 @@ namespace EcommerceSolutionEFCoreMVC.Services.Interfaces
             };
         }
         
-        public ReportDataViewModel GetSalesByProduct()
+        /*public ReportDataViewModel GetSalesByProduct()
         {
             return new ReportDataViewModel
             {
@@ -179,6 +179,6 @@ namespace EcommerceSolutionEFCoreMVC.Services.Interfaces
                     .Select(g => new KeyValuePair<string, decimal>(g.Key.ToString(), g.Sum(o => o.TotalAmount)))
                     .ToList()
             };
-        }
+        }*/
     }
 }

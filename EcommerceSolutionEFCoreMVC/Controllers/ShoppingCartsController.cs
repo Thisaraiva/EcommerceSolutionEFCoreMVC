@@ -6,6 +6,8 @@ using EcommerceSolutionEFCoreMVC.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using EcommerceSolutionEFCoreMVC.Models.ViewModels;
+using Humanizer;
+using EcommerceSolutionEFCoreMVC.Services.Interfaces;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers
 {
@@ -14,11 +16,13 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
     {
         private readonly EcommerceDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public ShoppingCartsController(EcommerceDbContext context, UserManager<ApplicationUser> userManager)
+        public ShoppingCartsController(EcommerceDbContext context, UserManager<ApplicationUser> userManager, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
+            _emailService = emailService;
         }
 
         private async Task<string> GetUserIdAsync() => await Task.FromResult(_userManager.GetUserId(User));
@@ -253,6 +257,10 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
             _context.ShoppingCartItems.RemoveRange(cart.ShoppingCartItems);
 
             await _context.SaveChangesAsync();
+
+            // Enviar e-mail de confirmação
+            var user = await _userManager.GetUserAsync(User);
+            await _emailService.SendOrderConfirmationEmail(user.Email, order);
 
             // Redireciona para a página de detalhes do pedido confirmado
             return RedirectToAction("Details", "Orders", new { id = order.OrderId });

@@ -6,12 +6,12 @@ namespace EcommerceSolutionEFCoreMVC.Services.Interfaces
     {
         ReportDataViewModel GetDefaultReports();
         ReportDataViewModel GetReportsByFilters(ReportFilterViewModel filters);
-        ReportDataViewModel GetSalesByProduct();
+        /*ReportDataViewModel GetSalesByProduct();
         ReportDataViewModel GetSalesByCategory();
         ReportDataViewModel GetSalesByState();
         public ReportDataViewModel GetSalesTotalByProduct();
         ReportDataViewModel GetOrdersByStatus();
-        ReportDataViewModel GetTotalValueByStatus();
+        ReportDataViewModel GetTotalValueByStatus();*/
     }
 
 }
