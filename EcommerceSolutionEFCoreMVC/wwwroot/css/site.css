@@ -1,31 +1,31 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .card-img-top {
     object-fit: contain; /* Faz a imagem se ajustar sem cortar */
     width: 100%;
-    height: auto; /* Mantém a proporção original da imagem */
-    max-height: 200px; /* Define uma altura máxima para manter o layout dos cards */
+    height: auto; /* Mant?m a propor??o original da imagem */
+    max-height: 200px; /* Define uma altura m?xima para manter o layout dos cards */
 }
 
 .container, .container-fluid {
@@ -46,18 +46,18 @@ table {
 /* site.css */
 
 html, body {
-    height: 100%;       
+    height: 100%;
 }
 
 body {
     background-color: #f8f9fa;
     font-family: Arial, sans-serif;
     display: flex;
-    flex-direction: column;    
+    flex-direction: column;
 }
 
 .container {
-    margin-top: 20px;       
+    margin-top: 20px;
 }
 
 .table-responsive {
@@ -65,11 +65,11 @@ body {
 }
 
 table {
-    width: 100%; /* Garante que a tabela ocupe 100% do container disponível */
+    width: 100%; /* Garante que a tabela ocupe 100% do container dispon?vel */
 }
 
 
-/* Espaço extra para o rodapé */
+/* Espa?o extra para o rodap? */
 main {
     padding-bottom: 20px;
 }
@@ -78,22 +78,23 @@ main {
     font-size: 0.9rem;
 }
 
-/* Navegação */
+/* Navega??o */
 .navbar-dark .navbar-nav .nav-link {
     color: rgba(255, 255, 255, 0.9);
 }
-.navbar-dark .navbar-nav .nav-link:hover {
-    color: #ddd;
-}
 
-/* Rodapé */
+    .navbar-dark .navbar-nav .nav-link:hover {
+        color: #ddd;
+    }
+
+/* Rodap? */
 footer {
     position: relative;
     bottom: 0;
     width: 100%;
 }
 
-/* Ajuste do tamanho da fonte do título */
+/* Ajuste do tamanho da fonte do t?tulo */
 h1 {
     font-size: 2rem;
     font-weight: 600;
@@ -156,7 +157,7 @@ h1 {
     margin-top: 10px;
 }
 
-/* Melhor alinhamento de botões e inputs */
+/* Melhor alinhamento de bot?es e inputs */
 form.d-flex.align-items-center .form-control {
     max-width: 60px;
     margin-right: 10px;
@@ -198,4 +199,39 @@ table {
 .btn-link {
     color: #333;
     font-weight: bold;
+}
+
+
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+}
+
+.carousel-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px; /* Altura m?nima para o carrossel */
+}
+
+.carousel-fade .carousel-item {
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
+}
+
+    .carousel-fade .carousel-item.active {
+        opacity: 1;
+    }
+
+.carousel-caption {
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
 }

@@ -6,7 +6,6 @@ using EcommerceSolutionEFCoreMVC.Models.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using EcommerceSolutionEFCoreMVC.Models.ViewModels;
-using Humanizer;
 using EcommerceSolutionEFCoreMVC.Services.Interfaces;
 
 namespace EcommerceSolutionEFCoreMVC.Controllers

@@ -1,6 +1,7 @@
 using EcommerceSolutionEFCoreMVC.Data;
 using EcommerceSolutionEFCoreMVC.Models.Entities;
 using EcommerceSolutionEFCoreMVC.Models.ErrorViewModel;
+using EcommerceSolutionEFCoreMVC.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,15 +23,26 @@ namespace EcommerceSolutionEFCoreMVC.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var products = _context.Products;
-            if (products == null)
+            // Carregar todos os produtos
+            var products = await _context.Products
+                                 .Include(p => p.Category) // Carrega as categorias relacionadas
+                                 .ToListAsync();
+
+            // Filtrar produtos em promoção
+            var promotionalProducts = products
+                                      .Where(p => p.Category != null && p.Category.Name == "Promotion")
+                                      .ToList();
+
+            // ViewModel com os dois conjuntos de produtos
+            var viewModel = new HomeIndexViewModel
             {
-                return View();
-            }
+                AllProducts = products,
+                PromotionalProducts = promotionalProducts
+            };
 
-
-            return View(await products.ToListAsync());
+            return View(viewModel);
         }
+
 
         [Authorize]
         public IActionResult Privacy()

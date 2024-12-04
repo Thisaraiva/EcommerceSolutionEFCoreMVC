@@ -1,7 +1,8 @@
-﻿@model IEnumerable<EcommerceSolutionEFCoreMVC.Models.Entities.Product>
+﻿@model EcommerceSolutionEFCoreMVC.Models.ViewModels.HomeIndexViewModel
 
 @{
     ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="text-center mb-5">
@@ -9,11 +10,51 @@
     <p>Explore our amazing collection of products below.</p>
 </div>
 
+<!-- Carrossel de Produtos em Promoção -->
+@if (Model.PromotionalProducts.Any())
+{
+    <div class="container my-4 text-center">
+        <h1>Promotion Products</h1>
+    </div>
+    
+    <div id="promotionalCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            @for (int i = 0; i < Model.PromotionalProducts.Count(); i++)
+            {
+                var product = Model.PromotionalProducts.ElementAt(i);
+                <div class="carousel-item @(i == 0 ? "active" : "")">
+                    <div class="d-flex justify-content-center">
+                        <div class="card shadow-sm" style="max-width: 18rem;">
+                            <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">@product.Name</h5>
+                                <p class="card-text text-muted">@product.Price.ToString("C")</p>
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#promotionalCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#promotionalCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+}
+
+<!-- Listagem de Todos os Produtos -->
 <div class="container">
     <div class="row">
-        @foreach (var product in Model)
+        <h1 class="my-3 text-center">All Our Products</h1>
+        @foreach (var product in Model.AllProducts)
         {
-            <div class="col-md-3 mb-3">
+            <div class="col-md-3 mb-3 mt-3">
                 <div class="card shadow-sm">
                     <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
                     <div class="card-body">
